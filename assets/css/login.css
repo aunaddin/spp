@@ -1,0 +1,86 @@
+html,
+body {
+    height: 100%;
+}
+
+body {
+    background: linear-gradient(
+            rgba(18, 84, 45, 0.75),
+            rgba(7, 57, 30, 0.85)
+        ),
+        url("../img/bg-login.jpg");
+
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.login-box {
+    width: 400px;
+}
+
+.login-card-body {
+    background: rgba(255,255,255,.92);
+    backdrop-filter: blur(10px);
+
+    border-radius: 15px;
+    padding: 35px;
+}
+
+.card {
+    border-radius: 15px;
+    border: none;
+    box-shadow: 0 15px 40px rgba(0,0,0,.25);
+}
+
+.logo-login{
+    width:90px;
+    height:90px;
+    object-fit:contain;
+    margin-bottom:15px;
+}
+
+.login-title{
+    font-size:26px;
+    font-weight:bold;
+     color:#ffffff;
+}
+
+.login-subtitle{
+     color:#f8f9fa;
+    margin-bottom:20px;
+}
+
+.btn-login{
+    background:#198754;
+    border:none;
+    border-radius:8px;
+    font-weight:bold;
+    color:#ffffff;
+}
+
+.btn-login:hover{
+    background:#146c43;
+    color:#ffffff;
+}
+
+.btn-login:focus,
+.btn-login:active{
+    color:#ffffff;
+    background:#146c43;
+    box-shadow:none;
+}
+
+.form-control{
+    border-radius:8px;
+}
+
+.input-group-text{
+    border-radius:0 8px 8px 0;
+    background:#198754;
+    color:white;
+}
+
+.alert{
+    border-radius:8px;
+}
