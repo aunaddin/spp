@@ -102,13 +102,13 @@ class Tagihan_model extends CI_Model {
         return ['berhasil' => $berhasil, 'dilewati' => $dilewati];
     }
     // Pencarian lengkap dengan filter, dipakai admin & bendahara
-    public function search($filter = [])
+    public function search($filter = [], $limit = null, $offset = 0)
     {
         $this->db->select('tagihan.*, santri.nama as nama_santri, santri.nis, kelas.nama_kelas, kelas.jenjang,
                             jenis_pembayaran.nama_pembayaran, pembayaran.no_bukti, pembayaran.tanggal_bayar');
         $this->db->from('tagihan');
         $this->db->join('santri', 'santri.id = tagihan.santri_id');
-        $this->db->join('kelas', 'kelas.id = santri.kelas_id', 'left'); // DIPERBAIKI: join ke tabel kelas
+        $this->db->join('kelas', 'kelas.id = santri.kelas_id', 'left');
         $this->db->join('jenis_pembayaran', 'jenis_pembayaran.id = tagihan.jenis_pembayaran_id');
         $this->db->join('pembayaran', 'pembayaran.tagihan_id = tagihan.id', 'left');
 
@@ -136,6 +136,43 @@ class Tagihan_model extends CI_Model {
 
         $this->db->order_by('tagihan.tahun', 'DESC');
         $this->db->order_by('santri.nama', 'ASC');
+
+        if ($limit !== null) {
+            $this->db->limit($limit, $offset);
+        }
         return $this->db->get()->result();
+    }
+
+    // Method BARU: hitung total baris dengan filter yang SAMA PERSIS seperti search(), tanpa limit
+    public function count_search($filter = [])
+    {
+        $this->db->from('tagihan');
+        $this->db->join('santri', 'santri.id = tagihan.santri_id');
+        $this->db->join('jenis_pembayaran', 'jenis_pembayaran.id = tagihan.jenis_pembayaran_id');
+        $this->db->join('pembayaran', 'pembayaran.tagihan_id = tagihan.id', 'left');
+
+        if (!empty($filter['keyword'])) {
+            $this->db->group_start();
+            $this->db->like('santri.nama', $filter['keyword']);
+            $this->db->or_like('santri.nis', $filter['keyword']);
+            $this->db->group_end();
+        }
+        if (!empty($filter['jenis_pembayaran_id'])) {
+            $this->db->where('tagihan.jenis_pembayaran_id', $filter['jenis_pembayaran_id']);
+        }
+        if (!empty($filter['bulan'])) {
+            $this->db->where('tagihan.bulan', $filter['bulan']);
+        }
+        if (!empty($filter['tahun'])) {
+            $this->db->where('tagihan.tahun', $filter['tahun']);
+        }
+        if (!empty($filter['status'])) {
+            $this->db->where('tagihan.status', $filter['status']);
+        }
+        if (!empty($filter['wali_id'])) {
+            $this->db->where('santri.wali_id', $filter['wali_id']);
+        }
+
+        return $this->db->count_all_results();
     }
 }

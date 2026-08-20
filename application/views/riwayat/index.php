@@ -4,9 +4,14 @@
     </div>
     <div class="card-body">
 
-        <div class="form-group">
-            <input type="text" id="searchTable" class="form-control" placeholder="Cari nama santri, no bukti, atau jenis pembayaran...">
-        </div>
+        <?= form_open('riwayat', ['method' => 'get', 'class' => 'form-inline mb-3']) ?>
+            <input type="text" name="keyword" class="form-control mr-2" style="width:300px"
+                placeholder="Cari nama santri, no bukti, atau jenis pembayaran..." value="<?= $keyword ?>">
+            <button type="submit" class="btn btn-secondary">Cari</button>
+            <?php if ($keyword): ?>
+                <a href="<?= site_url('riwayat') ?>" class="btn btn-link">Reset</a>
+            <?php endif; ?>
+        <?= form_close() ?>
 
         <table class="table table-bordered table-striped" id="tabelRiwayat">
             <thead>
@@ -68,10 +73,12 @@
                 </tr>
                 <?php endforeach; ?>
                 <?php if (empty($riwayat)): ?>
-                <tr><td colspan="10" class="text-center text-muted">Belum ada riwayat pembayaran</td></tr>  <!-- colspan naik dari 9 ke 10 -->
+                <tr><td colspan="<?= $role != 'wali_santri' ? 11 : 10 ?>" class="text-center text-muted">Belum ada riwayat pembayaran</td></tr>
                 <?php endif; ?>
             </tbody>
         </table>
+        <?php render_pagination($current_page, $total_pages); ?>
+        <p class="text-muted text-center small">Menampilkan <?= count($riwayat) ?> dari <?= $total_rows ?> total data</p>
     </div>
 </div>
 
@@ -99,15 +106,6 @@ document.querySelectorAll('.btn-lihat-alasan').forEach(function(btn) {
     btn.addEventListener('click', function() {
         document.getElementById('alasanNoBukti').textContent = this.dataset.nobukti;
         document.getElementById('alasanTeks').textContent = this.dataset.alasan;
-    });
-});
-</script>
-<script>
-document.getElementById('searchTable').addEventListener('keyup', function() {
-    var keyword = this.value.toLowerCase();
-    var rows = document.querySelectorAll('#tabelRiwayat tbody tr');
-    rows.forEach(function(row) {
-        row.style.display = row.textContent.toLowerCase().includes(keyword) ? '' : 'none';
     });
 });
 </script>

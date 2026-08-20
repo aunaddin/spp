@@ -82,5 +82,7 @@
                 <?php endif; ?>
             </tbody>
         </table>
+        <?php render_pagination($current_page, $total_pages); ?>
+        <p class="text-muted text-center small">Menampilkan <?= count($laporan) ?> dari <?= $total_rows ?> total data (yang sudah disetujui)</p>
     </div>
 </div>

@@ -8,9 +8,18 @@ class Kategori_pengeluaran_model extends CI_Model {
         parent::__construct();
     }
 
-    public function get_all()
+    public function get_all($limit = null, $offset = 0)
     {
-        return $this->db->order_by('nama_kategori', 'ASC')->get('kategori_pengeluaran')->result();
+        $this->db->order_by('nama_kategori', 'ASC');
+        if ($limit !== null) {
+            $this->db->limit($limit, $offset);
+        }
+        return $this->db->get('kategori_pengeluaran')->result();
+    }
+
+    public function count_all()
+    {
+        return $this->db->count_all_results('kategori_pengeluaran');
     }
 
     public function get_all_aktif()

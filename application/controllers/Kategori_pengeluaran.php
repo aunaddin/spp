@@ -13,7 +13,14 @@ class Kategori_pengeluaran extends MY_Controller {
 
     public function index()
     {
-        $data['kategori'] = $this->Kategori_pengeluaran_model->get_all();
+        $per_page = 10;
+        $page     = max(1, (int) $this->input->get('page'));
+        $offset   = ($page - 1) * $per_page;
+
+        $data['kategori']      = $this->Kategori_pengeluaran_model->get_all($per_page, $offset);
+        $data['total_rows']    = $this->Kategori_pengeluaran_model->count_all();
+        $data['current_page']  = $page;
+        $data['total_pages']   = ceil($data['total_rows'] / $per_page);
 
         $this->load->view('templates/header');
         $this->load->view('kategori_pengeluaran/index', $data);

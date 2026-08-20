@@ -9,6 +9,15 @@
 
         <?php $this->load->view('templates/alert'); ?>
 
+        <?= form_open('transaksi/konfirmasi', ['method' => 'get', 'class' => 'form-inline mb-3']) ?>
+            <input type="text" name="keyword" class="form-control mr-2" style="width:300px"
+                   placeholder="Cari nama santri, NIS, atau nama wali..." value="<?= $keyword ?>">
+            <button type="submit" class="btn btn-secondary">Cari</button>
+            <?php if ($keyword): ?>
+                <a href="<?= site_url('transaksi/konfirmasi') ?>" class="btn btn-link">Reset</a>
+            <?php endif; ?>
+        <?= form_close() ?>
+
         <table class="table table-bordered table-striped">
             <thead>
                 <tr>
@@ -38,7 +47,9 @@
                 </tr>
                 <?php endforeach; ?>
                 <?php if (empty($menunggu)): ?>
-                <tr><td colspan="7" class="text-center text-muted">Tidak ada pengajuan yang menunggu konfirmasi</td></tr>
+                <tr><td colspan="7" class="text-center text-muted">
+                    <?= $keyword ? 'Tidak ada pengajuan yang cocok dengan pencarian' : 'Tidak ada pengajuan yang menunggu konfirmasi' ?>
+                </td></tr>
                 <?php endif; ?>
             </tbody>
         </table>

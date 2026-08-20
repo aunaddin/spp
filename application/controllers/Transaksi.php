@@ -118,15 +118,17 @@ class Transaksi extends MY_Controller {
 
     public function konfirmasi()
     {
-        $this->cek_akses(['admin', 'bendahara']); // DITAMBAHKAN di method ini
+        $this->cek_akses(['admin', 'bendahara']);
         $this->load->model('Pembayaran_model');
-        $data['menunggu'] = $this->Pembayaran_model->get_menunggu_konfirmasi();
+
+        $keyword = $this->input->get('keyword');
+        $data['menunggu'] = $this->Pembayaran_model->get_menunggu_konfirmasi($keyword);
+        $data['keyword']  = $keyword;
 
         $this->load->view('templates/header');
         $this->load->view('transaksi/konfirmasi', $data);
         $this->load->view('templates/footer');
     }
-
     public function detail_konfirmasi($id)
     {
         $this->cek_akses(['admin', 'bendahara']); // DITAMBAHKAN di method ini

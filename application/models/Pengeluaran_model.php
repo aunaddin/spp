@@ -8,7 +8,7 @@ class Pengeluaran_model extends CI_Model {
         parent::__construct();
     }
 
-    public function get_all($filter = [])
+    public function get_all($filter = [], $limit = null, $offset = 0)
     {
         $this->db->select('pengeluaran.*, kategori_pengeluaran.nama_kategori, users.nama as nama_petugas');
         $this->db->from('pengeluaran');
@@ -26,7 +26,29 @@ class Pengeluaran_model extends CI_Model {
         }
 
         $this->db->order_by('pengeluaran.tanggal', 'DESC');
+        if ($limit !== null) {
+            $this->db->limit($limit, $offset);
+        }
         return $this->db->get()->result();
+    }
+
+    // Method BARU: hitung total baris dengan filter yang sama, untuk pagination
+    public function count_all($filter = [])
+    {
+        $this->db->from('pengeluaran');
+        $this->db->join('kategori_pengeluaran', 'kategori_pengeluaran.id = pengeluaran.kategori_id');
+
+        if (!empty($filter['bulan'])) {
+            $this->db->where('MONTH(pengeluaran.tanggal)', $filter['bulan']);
+        }
+        if (!empty($filter['tahun'])) {
+            $this->db->where('YEAR(pengeluaran.tanggal)', $filter['tahun']);
+        }
+        if (!empty($filter['kategori_id'])) {
+            $this->db->where('pengeluaran.kategori_id', $filter['kategori_id']);
+        }
+
+        return $this->db->count_all_results();
     }
 
     public function get_by_id($id)
@@ -50,17 +72,26 @@ class Pengeluaran_model extends CI_Model {
         return $this->db->delete('pengeluaran', ['id' => $id]);
     }
 
+    // Total nominal, TIDAK pakai limit, harus tetap menjumlahkan SEMUA data sesuai filter
     public function get_total($filter = [])
     {
-        $data = $this->get_all($filter);
-        $total = 0;
-        foreach ($data as $d) {
-            $total += $d->nominal;
+        $this->db->select_sum('pengeluaran.nominal');
+        $this->db->from('pengeluaran');
+
+        if (!empty($filter['bulan'])) {
+            $this->db->where('MONTH(pengeluaran.tanggal)', $filter['bulan']);
         }
-        return $total;
+        if (!empty($filter['tahun'])) {
+            $this->db->where('YEAR(pengeluaran.tanggal)', $filter['tahun']);
+        }
+        if (!empty($filter['kategori_id'])) {
+            $this->db->where('pengeluaran.kategori_id', $filter['kategori_id']);
+        }
+
+        $result = $this->db->get()->row();
+        return $result->nominal ?: 0;
     }
 
-    // Rekap per kategori untuk 1 bulan tertentu, dipakai di Laporan Keuangan
     public function get_rekap_per_kategori($bulan, $tahun)
     {
         $this->db->select('kategori_pengeluaran.nama_kategori, SUM(pengeluaran.nominal) as total');

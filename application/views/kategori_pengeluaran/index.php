@@ -57,5 +57,8 @@
                 <?php endforeach; ?>
             </tbody>
         </table>
+        </table>
+        <?php render_pagination($current_page, $total_pages); ?>
+        <p class="text-muted text-center small">Menampilkan <?= count($kategori) ?> dari <?= $total_rows ?> total data</p>
     </div>
 </div>

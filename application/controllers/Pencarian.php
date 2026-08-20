@@ -20,13 +20,19 @@ class Pencarian extends MY_Controller {
             'status'              => $this->input->get('status'),
         ];
 
-        // Wali santri hanya boleh cari data anaknya sendiri, dipaksa lewat filter wali_id
         if ($this->role == 'wali_santri') {
             $filter['wali_id'] = $this->user_id;
         }
 
-        $data['hasil']         = $this->Tagihan_model->search($filter);
-        $data['jenis_options'] = $this->Jenis_pembayaran_model->get_all();
+        $per_page = 10;
+        $page     = max(1, (int) $this->input->get('page'));
+        $offset   = ($page - 1) * $per_page;
+
+        $data['hasil']         = $this->Tagihan_model->search($filter, $per_page, $offset);
+        $data['total_rows']    = $this->Tagihan_model->count_search($filter);
+        $data['current_page']  = $page;
+        $data['total_pages']   = ceil($data['total_rows'] / $per_page);
+        $data['jenis_options'] = $this->Jenis_pembayaran_model->get_all_aktif();
         $data['filter']        = $filter;
         $data['role']          = $this->role;
 

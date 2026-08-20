@@ -20,10 +20,17 @@ class Pengeluaran extends MY_Controller {
             'kategori_id' => $this->input->get('kategori_id'),
         ];
 
-        $data['pengeluaran']     = $this->Pengeluaran_model->get_all($filter);
-        $data['total']           = $this->Pengeluaran_model->get_total($filter);
-        $data['kategori_options'] = $this->Kategori_pengeluaran_model->get_all();
-        $data['filter']          = $filter;
+        $per_page = 10;
+        $page     = max(1, (int) $this->input->get('page'));
+        $offset   = ($page - 1) * $per_page;
+
+        $data['pengeluaran']      = $this->Pengeluaran_model->get_all($filter, $per_page, $offset);
+        $data['total']            = $this->Pengeluaran_model->get_total($filter);
+        $data['total_rows']       = $this->Pengeluaran_model->count_all($filter);
+        $data['current_page']     = $page;
+        $data['total_pages']      = ceil($data['total_rows'] / $per_page);
+        $data['kategori_options'] = $this->Kategori_pengeluaran_model->get_all_aktif();
+        $data['filter']           = $filter;
 
         $this->load->view('templates/header');
         $this->load->view('pengeluaran/index', $data);

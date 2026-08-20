@@ -83,5 +83,7 @@
                 <?php endif; ?>
             </tbody>
         </table>
+        <?php render_pagination($current_page, $total_pages); ?>
+        <p class="text-muted text-center small">Menampilkan <?= count($hasil) ?> dari <?= $total_rows ?> total data</p>
     </div>
 </div>

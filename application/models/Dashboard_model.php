@@ -23,6 +23,7 @@ class Dashboard_model extends CI_Model {
     public function total_pemasukan_bulan_ini()
     {
         $this->db->select_sum('nominal_dibayar');
+        $this->db->where('status', 'disetujui'); // PERBAIKAN BUG
         $this->db->where('MONTH(tanggal_bayar)', date('m'));
         $this->db->where('YEAR(tanggal_bayar)', date('Y'));
         $result = $this->db->get('pembayaran')->row();
@@ -31,19 +32,23 @@ class Dashboard_model extends CI_Model {
 
     public function total_transaksi_hari_ini()
     {
-        return $this->db->get_where('pembayaran', ['tanggal_bayar' => date('Y-m-d')])->num_rows();
+        // PERBAIKAN: hanya hitung transaksi yang sudah disetujui, bukan yang masih menunggu/ditolak
+        return $this->db->get_where('pembayaran', [
+            'tanggal_bayar' => date('Y-m-d'),
+            'status'        => 'disetujui',
+        ])->num_rows();
     }
 
     // Grafik pemasukan 6 bulan terakhir (berdasarkan tanggal_bayar aktual)
     public function pemasukan_6_bulan()
     {
         $this->db->select("DATE_FORMAT(tanggal_bayar, '%Y-%m') as bulan, SUM(nominal_dibayar) as total");
+        $this->db->where('status', 'disetujui'); // PERBAIKAN BUG
         $this->db->where('tanggal_bayar >=', date('Y-m-d', strtotime('-6 months')));
         $this->db->group_by("DATE_FORMAT(tanggal_bayar, '%Y-%m')");
         $this->db->order_by('bulan', 'ASC');
         return $this->db->get('pembayaran')->result();
     }
-
     public function tagihan_terlambat($limit = 5)
     {
         $this->db->select('tagihan.*, santri.nama as nama_santri, santri.nis, jenis_pembayaran.nama_pembayaran');
